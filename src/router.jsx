@@ -6,6 +6,8 @@ import Stuff from "./pages/Stuff";
 import StuffTrash from "./pages/StuffTrash";
 import Users from "./pages/Users";
 import UsersTrash from "./pages/UsersTrash";
+import Lending from "./pages/Lending"
+import Inbound from "./pages/Inbound";
 
 export const router = createBrowserRouter([
     {path: '/', element: <App />},
@@ -15,6 +17,9 @@ export const router = createBrowserRouter([
     {path: '/stuffs/trash', element: <StuffTrash />},
     {path: '/users', element: <Users />},
     {path: '/users/trash', element: <UsersTrash />},
+    {path: '/lendings', element: <Lending />},
+    {path: '/inbound-stuffs', element: <Inbound />},
+
 
 
 ])
