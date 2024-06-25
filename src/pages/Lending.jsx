@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Table from "../components/Table";
 import axios from "axios";
@@ -15,7 +15,7 @@ export default function Lending() {
         "Action"
     ];
 
-    const [lendings, setLending] = useState({});
+    const [lendings, setLending] = useState([]);
 
     useEffect(() => {
         axios.get('http://localhost:8000/lendings', {
@@ -31,6 +31,21 @@ export default function Lending() {
             });
     }, []);
 
+    const handleDelete = (id) => {
+        axios.delete(`http://localhost:8000/lendings/delete/${id}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        })
+            .then(res => {
+                setLending(prevLendings => prevLendings.filter(lending => lending.id !== id));
+            })
+            .catch(err => {
+                console.log("Error deleting lending:", err);
+                alert("Error deleting lending. Please check the console for more details.");
+            });
+    };
+
     const columnDatabase = {
         "stuff_id": null,
         "name": null,
@@ -41,7 +56,6 @@ export default function Lending() {
     };
 
     const buttons = [
-        "edit",
         "delete",
         "create",
     ];
@@ -49,7 +63,6 @@ export default function Lending() {
     const endpoints = {
         "detail": "http://localhost:8000/lendings/{id}",
         "delete": "http://localhost:8000/lendings/delete/{id}",
-        "update": "http://localhost:8000/lendings/update/{id}",
         "store": "http://localhost:8000/lendings/store",
     };
 
@@ -83,7 +96,7 @@ export default function Lending() {
     return (
         <>
             <Navbar />
-            <div className="p-10"><br></br>
+            <div className="p-10">
                 <Table
                     dataTh={dataThParent}
                     dataTd={lendings}

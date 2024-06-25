@@ -17,9 +17,15 @@ export default function Inbound() {
     const [inbound, setInbound] = useState([]);
     const [showImageModal, setShowImageModal] = useState(false);
     const [imageSrc, setImageSrc] = useState('');
+    const [formData, setFormData] = useState({
+        stuff_id: '',
+        total: '',
+        date: '',
+        proof_file: null
+    });
 
     useEffect(() => {
-        axios.get('http://localhost:8000/inbound-stuffs/data', {
+        axios.get('http://localhost:8000/inbound-stuffs', {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('access_token')
             }
@@ -37,6 +43,41 @@ export default function Inbound() {
         setShowImageModal(true);
     };
 
+    const handleInputChange = (e) => {
+        const { name, value, files } = e.target;
+        if (name === 'proof_file') {
+            setFormData({ ...formData, proof_file: files[0] });
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
+    };
+
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        const data = new FormData();
+        for (const key in formData) {
+            data.append(key, formData[key]);
+        }
+        axios.post('http://localhost:8000/inbound-stuffs/store', data, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(res => {
+                setInbound([...inbound, res.data]);
+                setFormData({
+                    stuff_id: '',
+                    total: '',
+                    date: '',
+                    proof_file: null
+                });
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
+
     const columnDatabase = {
         "stuff_id": null,
         "total": null,
@@ -45,10 +86,9 @@ export default function Inbound() {
     };
 
     const buttons = [
-        "edit",
         "delete",
         "create",
-        "trash"
+        "trash",
     ];
 
     const endpoints = {
@@ -96,6 +136,8 @@ export default function Inbound() {
                     judulModalEdit={judulModalEdit}
                     inputData={inputData}
                     handleImageClick={handleImageClick}
+                    handleInputChange={handleInputChange}
+                    handleFormSubmit={handleFormSubmit}
                 />
             </div>
             <ImageModal
